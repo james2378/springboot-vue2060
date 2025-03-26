@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.TudiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shangjia_id as shangjiaId
+        ,a.tudi_name as tudiName
+        ,a.tudi_photo as tudiPhoto
+        ,a.tudi_file as tudiFile
+        ,a.tudi_address as tudiAddress
+        ,a.tudi_types as tudiTypes
+        ,a.tudi_shumu_types as tudiShumuTypes
+        ,a.tudi_haohuai_types as tudiHaohuaiTypes
+        ,a.tudi_old_money as tudiOldMoney
+        ,a.tudi_new_money as tudiNewMoney
+        ,a.tudi_clicknum as tudiClicknum
+        ,a.tudi_content as tudiContent
+        ,a.tudi_zulin_types as tudiZulinTypes
+        ,a.shangxia_types as shangxiaTypes
+        ,a.tudi_delete as tudiDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.TudiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,shangjia.shangjia_name as shangjiaName
+        ,shangjia.shangjia_phone as shangjiaPhone
+        ,shangjia.shangjia_email as shangjiaEmail
+        ,shangjia.shangjia_photo as shangjiaPhoto
+        ,shangjia.shangjia_xingji_types as shangjiaXingjiTypes
+        ,shangjia.new_money as newMoney
+        ,shangjia.shangjia_content as shangjiaContent
+        ,shangjia.shangjia_delete as shangjiaDelete
+
+        FROM tudi  a
+        left JOIN shangjia shangjia ON a.shangjia_id = shangjia.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shangjiaId != null and params.shangjiaId != ''">
+                and (
+                    a.shangjia_id = #{params.shangjiaId}
+                )
+            </if>
+            <if test=" params.tudiName != '' and params.tudiName != null and params.tudiName != 'null' ">
+                and a.tudi_name like CONCAT('%',#{params.tudiName},'%')
+            </if>
+            <if test=" params.tudiAddress != '' and params.tudiAddress != null and params.tudiAddress != 'null' ">
+                and a.tudi_address like CONCAT('%',#{params.tudiAddress},'%')
+            </if>
+            <if test="params.tudiTypes != null and params.tudiTypes != ''">
+                and a.tudi_types = #{params.tudiTypes}
+            </if>
+            <if test="params.tudiShumuTypes != null and params.tudiShumuTypes != ''">
+                and a.tudi_shumu_types = #{params.tudiShumuTypes}
+            </if>
+            <if test="params.tudiHaohuaiTypes != null and params.tudiHaohuaiTypes != ''">
+                and a.tudi_haohuai_types = #{params.tudiHaohuaiTypes}
+            </if>
+            <if test="params.tudiOldMoneyStart != null ">
+                <![CDATA[  and a.tudi_old_money >= #{params.tudiOldMoneyStart}   ]]>
+            </if>
+            <if test="params.tudiOldMoneyEnd != null ">
+                <![CDATA[  and a.tudi_old_money <= #{params.tudiOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.tudiNewMoneyStart != null ">
+                <![CDATA[  and a.tudi_new_money >= #{params.tudiNewMoneyStart}   ]]>
+            </if>
+            <if test="params.tudiNewMoneyEnd != null ">
+                <![CDATA[  and a.tudi_new_money <= #{params.tudiNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.tudiClicknumStart != null and params.tudiClicknumStart != ''">
+                <![CDATA[  and a.tudi_clicknum >= #{params.tudiClicknumStart}   ]]>
+            </if>
+            <if test="params.tudiClicknumEnd != null and params.tudiClicknumEnd != ''">
+                <![CDATA[  and a.tudi_clicknum <= #{params.tudiClicknumEnd}   ]]>
+            </if>
+             <if test="params.tudiClicknum != null and params.tudiClicknum != ''">
+                and a.tudi_clicknum = #{params.tudiClicknum}
+             </if>
+            <if test=" params.tudiContent != '' and params.tudiContent != null and params.tudiContent != 'null' ">
+                and a.tudi_content like CONCAT('%',#{params.tudiContent},'%')
+            </if>
+            <if test="params.tudiZulinTypes != null and params.tudiZulinTypes != ''">
+                and a.tudi_zulin_types = #{params.tudiZulinTypes}
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.tudiDeleteStart != null and params.tudiDeleteStart != ''">
+                <![CDATA[  and a.tudi_delete >= #{params.tudiDeleteStart}   ]]>
+            </if>
+            <if test="params.tudiDeleteEnd != null and params.tudiDeleteEnd != ''">
+                <![CDATA[  and a.tudi_delete <= #{params.tudiDeleteEnd}   ]]>
+            </if>
+             <if test="params.tudiDelete != null and params.tudiDelete != ''">
+                and a.tudi_delete = #{params.tudiDelete}
+             </if>
+
+                <!-- 判断农民的id不为空 -->
+            <if test=" params.shangjiaIdNotNull != '' and params.shangjiaIdNotNull != null and params.shangjiaIdNotNull != 'null' ">
+                and a.shangjia_id IS NOT NULL
+            </if>
+            <if test=" params.shangjiaName != '' and params.shangjiaName != null and params.shangjiaName != 'null' ">
+                and shangjia.shangjia_name like CONCAT('%',#{params.shangjiaName},'%')
+            </if>
+            <if test=" params.shangjiaPhone != '' and params.shangjiaPhone != null and params.shangjiaPhone != 'null' ">
+                and shangjia.shangjia_phone like CONCAT('%',#{params.shangjiaPhone},'%')
+            </if>
+            <if test=" params.shangjiaEmail != '' and params.shangjiaEmail != null and params.shangjiaEmail != 'null' ">
+                and shangjia.shangjia_email like CONCAT('%',#{params.shangjiaEmail},'%')
+            </if>
+            <if test="params.shangjiaXingjiTypes != null  and params.shangjiaXingjiTypes != ''">
+                and shangjia.shangjia_xingji_types = #{params.shangjiaXingjiTypes}
+            </if>
+
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and shangjia.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and shangjia.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test=" params.shangjiaContent != '' and params.shangjiaContent != null and params.shangjiaContent != 'null' ">
+                and shangjia.shangjia_content like CONCAT('%',#{params.shangjiaContent},'%')
+            </if>
+            <if test="params.shangjiaDeleteStart != null  and params.shangjiaDeleteStart != '' ">
+                <![CDATA[  and shangjia.shangjia_delete >= #{params.shangjiaDeleteStart}   ]]>
+            </if>
+            <if test="params.shangjiaDeleteEnd != null  and params.shangjiaDeleteEnd != '' ">
+                <![CDATA[  and shangjia.shangjia_delete <= #{params.shangjiaDeleteEnd}   ]]>
+            </if>
+            <if test="params.shangjiaDelete != null  and params.shangjiaDelete != '' ">
+                and shangjia.shangjia_delete = #{params.shangjiaDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
